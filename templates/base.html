@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <title>quick refills</title>
+    <link rel="stylesheet" href="../static/css/foundation.css" />
+  </head>
+  <body>
+    <script src="../static/jquery-1.10.2.js"></script>
+    <script>
+    $(document).ready(function() {
+      $(".refill_btn").click(function(event) {
+        $("#hide").html("<h1 style='margin-top:60px'><center>Refill processing...</center></h1>");
+      });
+    });
+    </script>
+
+    <div id="hide">
+    <div class="row">
+      <div class="large-12 columns">
+        <a href="/index"><h1 style="margin-top:20px">Quick Refills</h1></a>
+      </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="large-12 columns">
+      <div class="panel">
+    {% for message in messages %}
+        <h5 style="color:red">{{ message }}</h5>
+    {% endfor %}
+      </div>
+      </div>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+    </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+{% if not g.user.is_authenticated() %}
+  <div class="large-12 columns">
+    <h4><a href="/login">Log in</a> | <a href="/signup">Sign up</a></h4>
+  </div>
+
+  <div class="large-12 columns">
+    <h3>What is this?</h3>
+    <h6>Quick Refills is the easiest way to refill your CVS prescriptions.</h6>
+    <h3>How does it work?</h3>
+    <h6>Quick Refills orders your refill through your CVS pharmacy's automated phone system.</h6>
+    <h3>What's missing?</h3>
+    <h6>Currently, there is no way for the user to confirm whether a refill order was successful. (Though this can be verified by checking Twilio's call logs.) If you are out of refills or need doctor's approval, the app will not know.</h6>
+    <h3>Why?</h3>
+    <h6>For most people it is easy to refill prescriptions by phone or through CVS.com. My grandma is unable to do either without assistance. But she knows how to use a tablet to watch TV shows so I wanted to solve her problem with a simple app. There is a shortcut to this app on her tablet home screen and she can now easily order refills independently.
+    <h3>Who made this?</h3>
+    <h6><a href="http://andrewgma.com">andrewgma.com</a></h6>
+  </div>  
+{% endif %}
+
+{% if g.user.is_authenticated() %}
+  <div class="large-12 columns">
+    <h3>Hi, {{user.name}}!</h3>
+    <h6><a href="/logout">Log out</a></h6>
+  </div>
+
+  <div class="large-6 columns">
+    <h4>Your CVS pharmacy phone number</h4>
+    {% if g.user.store_num %}
+    <div class="row">
+    <div class="large-5 columns">
+      <div class="callout panel">
+        <center>{{phone_formatted}}</center>
+      </div>
+    </div>
+    <div class="large-7 columns">
+      <a href="/delete_store_num"><h6 style="color:red; padding-top:14px">Change phone #</h6></a>
+    </div>
+    </div>
+    {% else %}
+        <form action="" method="post" name="store_num">
+      <div class="panel">
+        {{form.hidden_tag()}}
+          <label>Please enter your CVS pharmacy phone number (10 digits only):<br><em>You can find this on your Rx label.</em></label>
+          <div class="large-6 columns">
+            {{form2.store_num()}}
+          </div>
+            <input type="submit" name="btn" value="Add Store Number" class="success button small">
+        </form>
+      </div>
+    {% endif %}
+    </div>
+
+    {% if rxs %}
+    <div class="large-12 columns">
+    <h4>Your Prescriptions</h4>
+    <table>
+    {% for rx in rxs %}
+      <tr height="50px">
+        <td><h5>Rx # <b>{{rx.rx_num}}</b></h5></td>
+        <td>
+          {% if rx.rx_name %}
+            <h5>{{rx.rx_name}}</h5>
+          {% endif %}
+        </td>
+        <td>
+          <div class="refill_btn">
+          <form style="margin-bottom: -16px" action="{{ url_for('refill') }}" method=post>
+          <input type=hidden value="{{rx.rx_num}}" name="rx_to_refill"></input>
+          <input type="submit" value="Refill" class="success button"></input>
+          </form>
+          </div>
+        </td>
+        <td>
+          <form style="margin-bottom: -16px" action="{{ url_for('delete_rx') }}" method=post>
+          <input type=hidden value="{{rx.rx_num}}" name="rx_to_delete"></input>
+          <input type="submit" class="alert button" value="Delete"></input>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
+    </div>
+    {% endif %}
+
+    <div class="large-12 columns">
+    <h4>Add Prescription</h4>
+      <form action="" method=post name="addrx">
+        {{form.hidden_tag()}}
+        <div class="row">
+          <div class="large-4 columns">
+          <label>Rx #:</label>
+          {{form.rx_num()}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="large-4 columns">
+          <label>Rx name (optional, for your reference):</label>
+          {{form.rx_name()}}
+          </div>
+        </div>
+        <input type="submit" name="btn" value="Add Rx" class="simple button">
+      </form>
+  </div>
+{% endif %}
+{% endblock %}
